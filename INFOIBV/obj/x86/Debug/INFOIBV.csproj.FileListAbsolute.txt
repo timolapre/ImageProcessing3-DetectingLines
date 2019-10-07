@@ -7,3 +7,30 @@ D:\Shared\Image Processing\assignment\INFOIBV\obj\x86\Debug\GenerateResource.rea
 D:\Shared\Image Processing\assignment\INFOIBV\obj\x86\Debug\GenerateResource.write.1.tlog
 D:\Shared\Image Processing\assignment\INFOIBV\obj\x86\Debug\INFOIBV.exe
 D:\Shared\Image Processing\assignment\INFOIBV\obj\x86\Debug\INFOIBV.pdb
+C:\Users\timgo\Documents\GitHub\Ass2-Beeld\INFOIBV\bin\Debug\INFOIBV.exe
+C:\Users\timgo\Documents\GitHub\Ass2-Beeld\INFOIBV\bin\Debug\INFOIBV.pdb
+C:\Users\timgo\Documents\GitHub\Ass2-Beeld\INFOIBV\obj\x86\Debug\INFOIBV.csprojResolveAssemblyReference.cache
+C:\Users\timgo\Documents\GitHub\Ass2-Beeld\INFOIBV\obj\x86\Debug\INFOIBV.INFOIBV.resources
+C:\Users\timgo\Documents\GitHub\Ass2-Beeld\INFOIBV\obj\x86\Debug\INFOIBV.Properties.Resources.resources
+C:\Users\timgo\Documents\GitHub\Ass2-Beeld\INFOIBV\obj\x86\Debug\INFOIBV.csproj.GenerateResource.Cache
+C:\Users\timgo\Documents\GitHub\Ass2-Beeld\INFOIBV\obj\x86\Debug\INFOIBV.csproj.CoreCompileInputs.cache
+C:\Users\timgo\Documents\GitHub\Ass2-Beeld\INFOIBV\obj\x86\Debug\INFOIBV.exe
+C:\Users\timgo\Documents\GitHub\Ass2-Beeld\INFOIBV\obj\x86\Debug\INFOIBV.pdb
+E:\OneDrive - Universiteit Utrecht\Documents\GitHubResporities\Ass2-Beeld\INFOIBV\bin\Debug\INFOIBV.exe
+E:\OneDrive - Universiteit Utrecht\Documents\GitHubResporities\Ass2-Beeld\INFOIBV\bin\Debug\INFOIBV.pdb
+E:\OneDrive - Universiteit Utrecht\Documents\GitHubResporities\Ass2-Beeld\INFOIBV\obj\x86\Debug\INFOIBV.csprojAssemblyReference.cache
+E:\OneDrive - Universiteit Utrecht\Documents\GitHubResporities\Ass2-Beeld\INFOIBV\obj\x86\Debug\INFOIBV.INFOIBV.resources
+E:\OneDrive - Universiteit Utrecht\Documents\GitHubResporities\Ass2-Beeld\INFOIBV\obj\x86\Debug\INFOIBV.Properties.Resources.resources
+E:\OneDrive - Universiteit Utrecht\Documents\GitHubResporities\Ass2-Beeld\INFOIBV\obj\x86\Debug\INFOIBV.csproj.GenerateResource.cache
+E:\OneDrive - Universiteit Utrecht\Documents\GitHubResporities\Ass2-Beeld\INFOIBV\obj\x86\Debug\INFOIBV.csproj.CoreCompileInputs.cache
+E:\OneDrive - Universiteit Utrecht\Documents\GitHubResporities\Ass2-Beeld\INFOIBV\obj\x86\Debug\INFOIBV.exe
+E:\OneDrive - Universiteit Utrecht\Documents\GitHubResporities\Ass2-Beeld\INFOIBV\obj\x86\Debug\INFOIBV.pdb
+E:\OneDrive - Universiteit Utrecht\Documents\GitHubResporities\ImageProcessing3-DetectingLines\INFOIBV\bin\Debug\INFOIBV.exe
+E:\OneDrive - Universiteit Utrecht\Documents\GitHubResporities\ImageProcessing3-DetectingLines\INFOIBV\bin\Debug\INFOIBV.pdb
+E:\OneDrive - Universiteit Utrecht\Documents\GitHubResporities\ImageProcessing3-DetectingLines\INFOIBV\obj\x86\Debug\INFOIBV.csprojAssemblyReference.cache
+E:\OneDrive - Universiteit Utrecht\Documents\GitHubResporities\ImageProcessing3-DetectingLines\INFOIBV\obj\x86\Debug\INFOIBV.INFOIBV.resources
+E:\OneDrive - Universiteit Utrecht\Documents\GitHubResporities\ImageProcessing3-DetectingLines\INFOIBV\obj\x86\Debug\INFOIBV.Properties.Resources.resources
+E:\OneDrive - Universiteit Utrecht\Documents\GitHubResporities\ImageProcessing3-DetectingLines\INFOIBV\obj\x86\Debug\INFOIBV.csproj.GenerateResource.cache
+E:\OneDrive - Universiteit Utrecht\Documents\GitHubResporities\ImageProcessing3-DetectingLines\INFOIBV\obj\x86\Debug\INFOIBV.csproj.CoreCompileInputs.cache
+E:\OneDrive - Universiteit Utrecht\Documents\GitHubResporities\ImageProcessing3-DetectingLines\INFOIBV\obj\x86\Debug\INFOIBV.exe
+E:\OneDrive - Universiteit Utrecht\Documents\GitHubResporities\ImageProcessing3-DetectingLines\INFOIBV\obj\x86\Debug\INFOIBV.pdb

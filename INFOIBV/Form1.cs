@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.IO;
+using System.Diagnostics;
 
 namespace INFOIBV
 {
@@ -22,6 +23,7 @@ namespace INFOIBV
 
         private void LoadImageButton_Click(object sender, EventArgs e)
         {
+            Debug.WriteLine("AAA");
            if (openImageDialog.ShowDialog() == DialogResult.OK)             // Open File Dialog
             {
                 string file = openImageDialog.FileName;                     // Get the file name
@@ -42,11 +44,12 @@ namespace INFOIBV
             if (OutputImage != null) OutputImage.Dispose();                 // Reset output image
             OutputImage = new Bitmap(InputImage.Size.Width, InputImage.Size.Height); // Create new output image
             Color[,] Image = new Color[InputImage.Size.Width, InputImage.Size.Height]; // Create array to speed-up operations (Bitmap functions are very slow)
+            int[,] houghImage = new int[InputImage.Size.Width, InputImage.Size.Height];
 
             // Setup progress bar
             progressBar.Visible = true;
             progressBar.Minimum = 1;
-            progressBar.Maximum = InputImage.Size.Width * InputImage.Size.Height;
+            progressBar.Maximum = InputImage.Size.Width * InputImage.Size.Height * 2;
             progressBar.Value = 1;
             progressBar.Step = 1;
 
@@ -60,19 +63,28 @@ namespace INFOIBV
             }
 
             //==========================================================================================
-            // TODO: include here your own code
-            // example: create a negative image
-            for (int x = 0; x < InputImage.Size.Width; x++)
+            int[,] grayscaleImage = new int[InputImage.Size.Width, InputImage.Size.Height];
+            for (int i = 0; i < InputImage.Size.Width; i++)
             {
-                for (int y = 0; y < InputImage.Size.Height; y++)
+                for (int j = 0; j < InputImage.Size.Height; j++)
                 {
-                    Color pixelColor = Image[x, y];                         // Get the pixel color at coordinate (x,y)
-                    Color updatedColor = Color.FromArgb(255 - pixelColor.R, 255 - pixelColor.G, 255 - pixelColor.B); // Negative image
-                    Image[x, y] = updatedColor;                             // Set the new pixel color at coordinate (x,y)
-                    progressBar.PerformStep();                              // Increment progress bar
+                    grayscaleImage[i, j] = toGrayscale(Image[i, j]);
                 }
             }
-            //==========================================================================================
+            if (houghTransformCheck.Checked)
+            {
+                houghImage = houghTransform(grayscaleImage);
+            }
+            //truncate and return grayscale image to actual image
+            for (int i = 0; i < InputImage.Size.Width; i++)
+            {
+                for (int j = 0; j < InputImage.Size.Height; j++)
+                {
+                    int color = truncate(houghImage[i, j]);
+                    Image[i, j] = Color.FromArgb(color, color, color);
+                    progressBar.PerformStep();
+                }
+            }
 
             // Copy array to output Bitmap
             for (int x = 0; x < InputImage.Size.Width; x++)
@@ -92,6 +104,78 @@ namespace INFOIBV
             if (OutputImage == null) return;                                // Get out if no output image
             if (saveImageDialog.ShowDialog() == DialogResult.OK)
                 OutputImage.Save(saveImageDialog.FileName);                 // Save the output image
+        }
+        
+        private int[,] houghTransform(int[,] img)
+        {
+            getBinary(img);
+            int[,] houghImage = new int[InputImage.Size.Width, InputImage.Size.Height];
+            for (int y = 0; y < InputImage.Size.Height; y++)
+            {
+                for (int x = 0; x < InputImage.Size.Width; x++)
+                {
+                    if (img[x, y] == 255)
+                    {
+                        Debug.WriteLine(x + " " + y);
+                        houghPerPixel(img, x, y, houghImage);
+                    }
+                }
+            }
+            return houghImage;
+        }
+
+        private void houghPerPixel(int[,] img, int xStart, int yStart, int[,] houghImage)
+        {
+            for (int y = yStart; y < InputImage.Size.Height; y++)
+            {
+                for (int x = xStart; x < InputImage.Size.Width; x++)
+                {
+                    if (img[x, y] == 255)
+                    {
+                        int[] line = getHoughLine(img, xStart, yStart, x, y);
+                        houghImage[line[1], line[0]] = 255;
+                    }
+                }
+            }
+        }
+
+        private int[] getHoughLine(int[,] img, int xStart, int yStart, int x, int y)
+        {
+            int xdif = x - xStart;
+            int ydif = y - yStart;
+            if (xdif == 0)
+                return new int[] { 0, 0 };
+            int a = ydif / xdif;
+            int b = yStart - (a * xStart);
+            Debug.WriteLine(a + " " + b);
+            int[] ret = new int[] { a, b };
+            return ret;
+        }
+
+        private int truncate(int value)
+        {
+            return Math.Max(Math.Min(value, 255), 0);
+        }
+
+        private int toGrayscale(Color pixelColor)
+        {
+            int grayscale = (int)((pixelColor.R * 0.3f) + (pixelColor.G * 0.59f) + (pixelColor.B * 0.11f));
+            return grayscale;
+        }
+
+        private void getBinary(int[,] img)
+        {
+            for (int x = 0; x < InputImage.Size.Width; x++)
+            {
+                for (int y = 0; y < InputImage.Size.Height; y++)
+                {
+                    int pixelColor = img[x, y];
+                    if (pixelColor < 128)
+                        img[x, y] = 0;
+                    else
+                        img[x, y] = 255;
+                }
+            }
         }
 
     }

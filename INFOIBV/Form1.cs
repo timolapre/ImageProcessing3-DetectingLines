@@ -14,12 +14,14 @@ namespace INFOIBV
     public partial class INFOIBV : Form
     {
         private Bitmap InputImage;
-        private Bitmap InputImage2;
         private Bitmap OutputImage;
+        private Bitmap houghImageBitmap;
         private int OutputWidth, OutputHeight;
 
         private int startX = -1, startY = -1, firstX = -1, firstY= -1;
         private int boundaryX, boundaryY, boundaryDirection;
+
+        private int houghSize = 500;
 
         public INFOIBV()
         {
@@ -48,8 +50,10 @@ namespace INFOIBV
             if (InputImage == null) return;                                 // Get out if no input image
             if (OutputImage != null) OutputImage.Dispose();                 // Reset output image
             OutputImage = new Bitmap(InputImage.Size.Width, InputImage.Size.Height); // Create new output image
+            if(houghImageBitmap != null) houghImageBitmap.Dispose();
+            houghImageBitmap = new Bitmap(houghSize, houghSize);
             Color[,] Image = new Color[InputImage.Size.Width, InputImage.Size.Height]; // Create array to speed-up operations (Bitmap functions are very slow)
-            int[,] houghImage = new int[InputImage.Size.Width, InputImage.Size.Height];
+            int[,] houghImage = new int[houghSize, houghSize];
 
             // Setup progress bar
             progressBar.Visible = true;
@@ -94,7 +98,17 @@ namespace INFOIBV
                 getBoundary(grayscaleImage);
                 if(houghTransformCheckbox.Checked && !FullShapes.Checked && !BiggestShape.Checked)
                 {
-                    getHoughTransform(grayscaleImage);
+                    getHoughTransform(grayscaleImage, houghImage);
+                    for (int x = 0; x < houghSize-1; x++)
+                    {
+                        for (int y = 0; y < houghSize-1; y++)
+                        {
+                            int val = truncate(houghImage[x, y]);
+                            Color color = Color.FromArgb(val,val,val);
+                            houghImageBitmap.SetPixel(x, y, color);
+                        }
+                    }
+                    houghImageOutput.Image = houghImageBitmap;
                 }
             }
 
@@ -112,9 +126,9 @@ namespace INFOIBV
             //==========================================================================================
 
             // Copy array to output Bitmap
-            for (int x = 0; x < OutputWidth; x++)
+            for (int x = 0; x < OutputWidth-1; x++)
             {
-                for (int y = 0; y < OutputHeight; y++)
+                for (int y = 0; y < OutputHeight-1; y++)
                 {
                     OutputImage.SetPixel(x, y, Image[x, y]);               // Set the pixel color at coordinate (x,y)
                 }
@@ -124,23 +138,32 @@ namespace INFOIBV
             progressBar.Visible = false;                                    // Hide progress bar
         }
 
-        private void getHoughTransform(int[,] img)
+        private void getHoughTransform(int[,] img, int[,] houghImage)
         {
-            for (int y = 0; y < OutputWidth; y++)
+            for (int y = 0; y < OutputHeight - 1; y++)
             {
-                for (int x = 0; x < OutputHeight; x++)
+                for (int x = 0; x < OutputWidth-1; x++)
                 {
                     if(img[x,y] == 255)
                     {
-                        houghValues(x, y);   
+                        houghValues(x, y, houghImage);   
                     }
                 }
             }
         }
 
-        private void houghValues(int x, int y)
+        private void houghValues(int x, int y, int[,] houghImage)
         {
-
+            float max = Math.Max(OutputHeight, OutputWidth)-1;
+            float min = -max;
+            float a = (float)houghSize / (max - min);
+            float b = -(a * min);
+            for (float o = 0; o < Math.PI; o+=(float)(Math.PI/ houghSize))
+            {
+                float r = (float)(x * Math.Cos(o) + y * Math.Sin(o)); 
+                //Debug.WriteLine(max - min + " " + a + " " + b + " " + r + " " + a*r+b);
+                houghImage[(int)(o * houghSize / Math.PI), (int)(a*r+b)] += 1;
+            }
         }
 
         private void getBoundary(int[,] img)
@@ -256,7 +279,7 @@ namespace INFOIBV
                                 img[x, y] = 0;
                         }
                         else if (labelImg[x, y] > 1)
-                            img[x, y] = 255 - labelImg[x, y] * 20;
+                            img[x, y] = 255;// - labelImg[x, y] * 20;
                     }
                 }
             }
@@ -270,7 +293,7 @@ namespace INFOIBV
                 shapeSize[label-2]++;
             if(!FullShapes.Checked)
                 shapeBoundaries[label - 2].Add(new int[2] {boundaryX,boundaryY});
-            Debug.WriteLine(startX + " " + startY + " " + firstX + " " + firstY + " " + label + " " + boundaryDirection + " " + boundaryX + " " + boundaryY);
+            //Debug.WriteLine(startX + " " + startY + " " + firstX + " " + firstY + " " + label + " " + boundaryDirection + " " + boundaryX + " " + boundaryY);
             if (firstX == -1 && firstY == -1 && (boundaryX != startX || boundaryY != startY))
             {
                 firstX = boundaryX;

@@ -45,8 +45,10 @@ namespace INFOIBV
             this.BiggestShape = new System.Windows.Forms.CheckBox();
             this.FullShapes = new System.Windows.Forms.CheckBox();
             this.houghTransformCheckbox = new System.Windows.Forms.CheckBox();
+            this.houghImageOutput = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.houghImageOutput)).BeginInit();
             this.SuspendLayout();
             // 
             // LoadImageButton
@@ -83,10 +85,10 @@ namespace INFOIBV
             // 
             // pictureBox1
             // 
-            this.pictureBox1.Location = new System.Drawing.Point(16, 95);
+            this.pictureBox1.Location = new System.Drawing.Point(16, 62);
             this.pictureBox1.Margin = new System.Windows.Forms.Padding(4);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(803, 577);
+            this.pictureBox1.Size = new System.Drawing.Size(600, 600);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.pictureBox1.TabIndex = 2;
             this.pictureBox1.TabStop = false;
@@ -120,10 +122,10 @@ namespace INFOIBV
             // 
             // pictureBox2
             // 
-            this.pictureBox2.Location = new System.Drawing.Point(827, 93);
+            this.pictureBox2.Location = new System.Drawing.Point(624, 62);
             this.pictureBox2.Margin = new System.Windows.Forms.Padding(4);
             this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(722, 579);
+            this.pictureBox2.Size = new System.Drawing.Size(600, 600);
             this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.pictureBox2.TabIndex = 5;
             this.pictureBox2.TabStop = false;
@@ -195,11 +197,22 @@ namespace INFOIBV
             this.houghTransformCheckbox.Text = "Hough Transform";
             this.houghTransformCheckbox.UseVisualStyleBackColor = true;
             // 
+            // houghImageOutput
+            // 
+            this.houghImageOutput.Location = new System.Drawing.Point(1257, 125);
+            this.houghImageOutput.Margin = new System.Windows.Forms.Padding(4);
+            this.houghImageOutput.Name = "houghImageOutput";
+            this.houghImageOutput.Size = new System.Drawing.Size(500, 500);
+            this.houghImageOutput.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.houghImageOutput.TabIndex = 23;
+            this.houghImageOutput.TabStop = false;
+            // 
             // INFOIBV
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1833, 935);
+            this.Controls.Add(this.houghImageOutput);
             this.Controls.Add(this.houghTransformCheckbox);
             this.Controls.Add(this.FullShapes);
             this.Controls.Add(this.BiggestShape);
@@ -219,6 +232,7 @@ namespace INFOIBV
             this.Text = "INFOIBV";
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.houghImageOutput)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -241,6 +255,7 @@ namespace INFOIBV
         private CheckBox BiggestShape;
         private CheckBox FullShapes;
         private CheckBox houghTransformCheckbox;
+        private PictureBox houghImageOutput;
     }
 }
 

@@ -46,6 +46,13 @@ namespace INFOIBV
             this.FullShapes = new System.Windows.Forms.CheckBox();
             this.houghTransformCheckbox = new System.Windows.Forms.CheckBox();
             this.houghImageOutput = new System.Windows.Forms.PictureBox();
+            this.houghThresholdCheckbox = new System.Windows.Forms.CheckBox();
+            this.houghThresholdVal = new System.Windows.Forms.TextBox();
+            this.houghAngleMaxValue = new System.Windows.Forms.TextBox();
+            this.houghAngleMinValue = new System.Windows.Forms.TextBox();
+            this.minIntensityThresVal = new System.Windows.Forms.TextBox();
+            this.minLengthParVal = new System.Windows.Forms.TextBox();
+            this.maxGapParVal = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.houghImageOutput)).BeginInit();
@@ -196,10 +203,11 @@ namespace INFOIBV
             this.houghTransformCheckbox.TabIndex = 22;
             this.houghTransformCheckbox.Text = "Hough Transform";
             this.houghTransformCheckbox.UseVisualStyleBackColor = true;
+            this.houghTransformCheckbox.CheckedChanged += new System.EventHandler(this.houghTransformCheckbox_CheckedChanged);
             // 
             // houghImageOutput
             // 
-            this.houghImageOutput.Location = new System.Drawing.Point(1257, 125);
+            this.houghImageOutput.Location = new System.Drawing.Point(1257, 171);
             this.houghImageOutput.Margin = new System.Windows.Forms.Padding(4);
             this.houghImageOutput.Name = "houghImageOutput";
             this.houghImageOutput.Size = new System.Drawing.Size(500, 500);
@@ -207,11 +215,78 @@ namespace INFOIBV
             this.houghImageOutput.TabIndex = 23;
             this.houghImageOutput.TabStop = false;
             // 
+            // houghThresholdCheckbox
+            // 
+            this.houghThresholdCheckbox.AutoSize = true;
+            this.houghThresholdCheckbox.Location = new System.Drawing.Point(1461, 62);
+            this.houghThresholdCheckbox.Margin = new System.Windows.Forms.Padding(5);
+            this.houghThresholdCheckbox.Name = "houghThresholdCheckbox";
+            this.houghThresholdCheckbox.Size = new System.Drawing.Size(140, 21);
+            this.houghThresholdCheckbox.TabIndex = 24;
+            this.houghThresholdCheckbox.Text = "Hough Threshold";
+            this.houghThresholdCheckbox.UseVisualStyleBackColor = true;
+            // 
+            // houghThresholdVal
+            // 
+            this.houghThresholdVal.Location = new System.Drawing.Point(1609, 62);
+            this.houghThresholdVal.Name = "houghThresholdVal";
+            this.houghThresholdVal.Size = new System.Drawing.Size(100, 22);
+            this.houghThresholdVal.TabIndex = 25;
+            // 
+            // houghAngleMaxValue
+            // 
+            this.houghAngleMaxValue.Location = new System.Drawing.Point(1715, 41);
+            this.houghAngleMaxValue.Name = "houghAngleMaxValue";
+            this.houghAngleMaxValue.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.houghAngleMaxValue.Size = new System.Drawing.Size(100, 22);
+            this.houghAngleMaxValue.TabIndex = 26;
+            this.houghAngleMaxValue.Text = "180";
+            // 
+            // houghAngleMinValue
+            // 
+            this.houghAngleMinValue.Location = new System.Drawing.Point(1609, 40);
+            this.houghAngleMinValue.Name = "houghAngleMinValue";
+            this.houghAngleMinValue.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.houghAngleMinValue.Size = new System.Drawing.Size(100, 22);
+            this.houghAngleMinValue.TabIndex = 27;
+            this.houghAngleMinValue.Text = "0";
+            // 
+            // minIntensityThresVal
+            // 
+            this.minIntensityThresVal.Location = new System.Drawing.Point(1257, 142);
+            this.minIntensityThresVal.Name = "minIntensityThresVal";
+            this.minIntensityThresVal.Size = new System.Drawing.Size(100, 22);
+            this.minIntensityThresVal.TabIndex = 28;
+            this.minIntensityThresVal.Text = "min intensity threshold";
+            // 
+            // minLengthParVal
+            // 
+            this.minLengthParVal.Location = new System.Drawing.Point(1363, 142);
+            this.minLengthParVal.Name = "minLengthParVal";
+            this.minLengthParVal.Size = new System.Drawing.Size(100, 22);
+            this.minLengthParVal.TabIndex = 29;
+            this.minLengthParVal.Text = "min length parameter";
+            // 
+            // maxGapParVal
+            // 
+            this.maxGapParVal.Location = new System.Drawing.Point(1469, 142);
+            this.maxGapParVal.Name = "maxGapParVal";
+            this.maxGapParVal.Size = new System.Drawing.Size(100, 22);
+            this.maxGapParVal.TabIndex = 30;
+            this.maxGapParVal.Text = "max gap parameter";
+            // 
             // INFOIBV
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1833, 935);
+            this.Controls.Add(this.maxGapParVal);
+            this.Controls.Add(this.minLengthParVal);
+            this.Controls.Add(this.minIntensityThresVal);
+            this.Controls.Add(this.houghAngleMinValue);
+            this.Controls.Add(this.houghAngleMaxValue);
+            this.Controls.Add(this.houghThresholdVal);
+            this.Controls.Add(this.houghThresholdCheckbox);
             this.Controls.Add(this.houghImageOutput);
             this.Controls.Add(this.houghTransformCheckbox);
             this.Controls.Add(this.FullShapes);
@@ -256,6 +331,13 @@ namespace INFOIBV
         private CheckBox FullShapes;
         private CheckBox houghTransformCheckbox;
         private PictureBox houghImageOutput;
+        private CheckBox houghThresholdCheckbox;
+        private TextBox houghThresholdVal;
+        private TextBox houghAngleMaxValue;
+        private TextBox houghAngleMinValue;
+        private TextBox minIntensityThresVal;
+        private TextBox minLengthParVal;
+        private TextBox maxGapParVal;
     }
 }
 

@@ -53,7 +53,7 @@ namespace INFOIBV
             if(houghImageBitmap != null) houghImageBitmap.Dispose();
             houghImageBitmap = new Bitmap(houghSize, houghSize);
             Color[,] Image = new Color[InputImage.Size.Width, InputImage.Size.Height]; // Create array to speed-up operations (Bitmap functions are very slow)
-            int[,] houghImage = new int[houghSize, houghSize];
+            float[,] houghImage = new float[houghSize+1, houghSize+1];
 
             // Setup progress bar
             progressBar.Visible = true;
@@ -96,20 +96,36 @@ namespace INFOIBV
             if (BoundaryTrace.Checked)
             {
                 getBoundary(grayscaleImage);
-                if(houghTransformCheckbox.Checked && !FullShapes.Checked && !BiggestShape.Checked)
+            }
+
+            if(houghTransformCheckbox.Checked)
+            {
+                getHoughTransform(grayscaleImage, houghImage);
+                for (int x = 0; x < houghSize - 1; x++)
                 {
-                    getHoughTransform(grayscaleImage, houghImage);
-                    for (int x = 0; x < houghSize-1; x++)
+                    for (int y = 0; y < houghSize - 1; y++)
                     {
-                        for (int y = 0; y < houghSize-1; y++)
+                        int val = truncate((int)houghImage[x, y]);
+                        if (houghThresholdCheckbox.Checked)
                         {
-                            int val = truncate(houghImage[x, y]);
-                            Color color = Color.FromArgb(val,val,val);
-                            houghImageBitmap.SetPixel(x, y, color);
+                            int up = truncate((int)houghImage[Math.Max(Math.Min(x, houghSize - 1), 0), Math.Max(Math.Min(y + 1, houghSize - 1), 0)]);
+                            int down = truncate((int)houghImage[Math.Max(Math.Min(x, houghSize - 1), 0), Math.Max(Math.Min(y - 1, houghSize - 1), 0)]);
+                            int left = truncate((int)houghImage[Math.Max(Math.Min(x - 1, houghSize - 1), 0), Math.Max(Math.Min(y, houghSize - 1), 0)]);
+                            int right = truncate((int)houghImage[Math.Max(Math.Min(x + 1, houghSize - 1), 0), Math.Max(Math.Min(y, houghSize - 1), 0)]);
+                            if (up > val || down > val || right > val || left > val)
+                            {
+                                val = 0;
+                            }
+                            if (val < int.Parse(houghThresholdVal.Text))
+                                val = 0;
+                            else
+                                val = 255;
                         }
+                        Color color = Color.FromArgb(val,val,val);
+                        houghImageBitmap.SetPixel(x, y, color);
                     }
-                    houghImageOutput.Image = houghImageBitmap;
                 }
+                houghImageOutput.Image = houghImageBitmap;
             }
 
             //truncate and return grayscale image to actual image
@@ -138,31 +154,33 @@ namespace INFOIBV
             progressBar.Visible = false;                                    // Hide progress bar
         }
 
-        private void getHoughTransform(int[,] img, int[,] houghImage)
+        private void getHoughTransform(int[,] img, float[,] houghImage)
         {
             for (int y = 0; y < OutputHeight - 1; y++)
             {
                 for (int x = 0; x < OutputWidth-1; x++)
                 {
-                    if(img[x,y] == 255)
-                    {
-                        houghValues(x, y, houghImage);   
-                    }
+                    if (img[x, y] == 0) continue;
+                    houghValues(x, y, houghImage, img);   
                 }
             }
         }
 
-        private void houghValues(int x, int y, int[,] houghImage)
+        private void houghValues(int x, int y, float[,] houghImage, int[,] img)
         {
-            float max = Math.Max(OutputHeight, OutputWidth)-1;
+            float maxAngle = (float)(int.Parse(houghAngleMaxValue.Text)*Math.PI/180f);
+            float minAngle = (float)(int.Parse(houghAngleMinValue.Text) * Math.PI / 180f);
+            float m = Math.Max(OutputHeight,OutputWidth);
+            float l = 0.78539791f;
+            float max = (float)(m * Math.Cos(l) + m * Math.Sin(l));
             float min = -max;
-            float a = (float)houghSize / (max - min);
+            float a = houghSize / (max - min);
             float b = -(a * min);
-            for (float o = 0; o < Math.PI; o+=(float)(Math.PI/ houghSize))
+            for (float o = minAngle; o <= maxAngle; o+=(maxAngle / houghSize))
             {
-                float r = (float)(x * Math.Cos(o) + y * Math.Sin(o)); 
+                float r = (float)((x-OutputWidth/2) * Math.Cos(o) + (y-OutputHeight/2) * Math.Sin(o));
                 //Debug.WriteLine(max - min + " " + a + " " + b + " " + r + " " + a*r+b);
-                houghImage[(int)(o * houghSize / Math.PI), (int)(a*r+b)] += 1;
+                houghImage[(int)(Math.Round(o * houghSize / maxAngle)), (int)(Math.Round(a*r+b))] += img[x,y]/255f;
             }
         }
 
@@ -453,6 +471,12 @@ namespace INFOIBV
                     }
                 }
             }
+        }
+
+        private void houghTransformCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (houghTransformCheckbox.Checked)
+                BoundaryTrace.Checked = true;
         }
 
         private int[,] complement(int[,] img)

@@ -53,6 +53,7 @@ namespace INFOIBV
             this.minIntensityThresVal = new System.Windows.Forms.TextBox();
             this.minLengthParVal = new System.Windows.Forms.TextBox();
             this.maxGapParVal = new System.Windows.Forms.TextBox();
+            this.lineDetectionCheckbox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.houghImageOutput)).BeginInit();
@@ -232,6 +233,7 @@ namespace INFOIBV
             this.houghThresholdVal.Name = "houghThresholdVal";
             this.houghThresholdVal.Size = new System.Drawing.Size(100, 22);
             this.houghThresholdVal.TabIndex = 25;
+            this.houghThresholdVal.Text = "100";
             // 
             // houghAngleMaxValue
             // 
@@ -275,11 +277,23 @@ namespace INFOIBV
             this.maxGapParVal.TabIndex = 30;
             this.maxGapParVal.Text = "max gap parameter";
             // 
+            // lineDetectionCheckbox
+            // 
+            this.lineDetectionCheckbox.AutoSize = true;
+            this.lineDetectionCheckbox.Location = new System.Drawing.Point(1257, 113);
+            this.lineDetectionCheckbox.Margin = new System.Windows.Forms.Padding(5);
+            this.lineDetectionCheckbox.Name = "lineDetectionCheckbox";
+            this.lineDetectionCheckbox.Size = new System.Drawing.Size(121, 21);
+            this.lineDetectionCheckbox.TabIndex = 31;
+            this.lineDetectionCheckbox.Text = "Line Detection";
+            this.lineDetectionCheckbox.UseVisualStyleBackColor = true;
+            // 
             // INFOIBV
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1833, 935);
+            this.Controls.Add(this.lineDetectionCheckbox);
             this.Controls.Add(this.maxGapParVal);
             this.Controls.Add(this.minLengthParVal);
             this.Controls.Add(this.minIntensityThresVal);
@@ -338,6 +352,7 @@ namespace INFOIBV
         private TextBox minIntensityThresVal;
         private TextBox minLengthParVal;
         private TextBox maxGapParVal;
+        private CheckBox lineDetectionCheckbox;
     }
 }
 

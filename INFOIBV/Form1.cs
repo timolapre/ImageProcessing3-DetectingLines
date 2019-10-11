@@ -22,6 +22,7 @@ namespace INFOIBV
         private int boundaryX, boundaryY, boundaryDirection;
 
         private int houghSize = 500;
+        float maxAngle, minAngle, a, b;
 
         public INFOIBV()
         {
@@ -120,12 +121,26 @@ namespace INFOIBV
                                 val = 0;
                             else
                                 val = 255;
+                            houghImage[x, y] = val;
                         }
                         Color color = Color.FromArgb(val,val,val);
                         houghImageBitmap.SetPixel(x, y, color);
                     }
                 }
                 houghImageOutput.Image = houghImageBitmap;
+            }
+
+            for (int i = 0; i < OutputWidth; i++)
+            {
+                for (int j = 0; j < OutputHeight; j++)
+                {
+                    //grayscaleImage[i, j] = 0;
+                }
+            }
+
+            if (lineDetectionCheckbox.Checked)
+            {
+                List<int[]> lines = lineDetection(grayscaleImage, houghImage);
             }
 
             //truncate and return grayscale image to actual image
@@ -168,20 +183,53 @@ namespace INFOIBV
 
         private void houghValues(int x, int y, float[,] houghImage, int[,] img)
         {
-            float maxAngle = (float)(int.Parse(houghAngleMaxValue.Text)*Math.PI/180f);
-            float minAngle = (float)(int.Parse(houghAngleMinValue.Text) * Math.PI / 180f);
+            maxAngle = (float)((int.Parse(houghAngleMaxValue.Text)+1)*Math.PI/180f);
+            minAngle = (float)(int.Parse(houghAngleMinValue.Text) * Math.PI / 180f);
             float m = Math.Max(OutputHeight,OutputWidth);
             float l = 0.78539791f;
             float max = (float)(m * Math.Cos(l) + m * Math.Sin(l));
             float min = -max;
-            float a = houghSize / (max - min);
-            float b = -(a * min);
+            a = houghSize / (max - min);
+            b = -(a * min);
             for (float o = minAngle; o <= maxAngle; o+=(maxAngle / houghSize))
             {
+                //Debug.WriteLine(o*180/Math.PI);
                 float r = (float)((x-OutputWidth/2) * Math.Cos(o) + (y-OutputHeight/2) * Math.Sin(o));
                 //Debug.WriteLine(max - min + " " + a + " " + b + " " + r + " " + a*r+b);
-                houghImage[(int)(Math.Round(o * houghSize / maxAngle)), (int)(Math.Round(a*r+b))] += img[x,y]/255f;
+                houghImage[(int)(Math.Round(o * houghSize / maxAngle)), (int)(Math.Round(a * r + b))] += img[x,y]/255f;
             }
+        }
+
+        private List<int[]> lineDetection(int[,] img, float[,] houghImage)
+        {
+            List<int[]> lines = new List<int[]>();
+            for (int r = 0; r < houghImage.GetLength(1) - 1; r++)
+            {
+                for (int o = 0; o < houghImage.GetLength(0) - 1; o++)
+                {
+                    if (houghImage[o, r] == 255)
+                    {
+                        Debug.WriteLine("NEW PIXEL");
+                        float actualo = (float)(Math.Round(o * maxAngle / houghSize));
+                        float actualr = (float)(Math.Round((r-b)/a));
+                        Debug.WriteLine(actualo + " " + actualr);
+                        int startXpos = (int)Math.Round(Math.Cos(actualo) * actualr) +OutputWidth/2;
+                        int startYpos = (int)Math.Round(Math.Sin(actualo) * actualr) +OutputHeight/2;
+                        Debug.WriteLine(startXpos + " " + startYpos);
+                        float angle = (float)(o * 180 / Math.PI);
+                        angle = (angle + 90) % 180;
+                        angle = (float)(angle * Math.PI / 180);
+                        for (int x = startXpos; x < startXpos+20; x++)
+                        {
+                            int y = startYpos+(int)Math.Round(x*Math.Tan(angle));
+                            if(x > 0 && y > 0 && x < OutputWidth && y < OutputHeight)
+                                img[x, y] = 255;
+                            Debug.WriteLine(x + " " + y);
+                        }
+                    }
+                }
+            }
+            return lines;
         }
 
         private void getBoundary(int[,] img)
@@ -475,8 +523,6 @@ namespace INFOIBV
 
         private void houghTransformCheckbox_CheckedChanged(object sender, EventArgs e)
         {
-            if (houghTransformCheckbox.Checked)
-                BoundaryTrace.Checked = true;
         }
 
         private int[,] complement(int[,] img)

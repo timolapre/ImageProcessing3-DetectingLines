@@ -102,31 +102,7 @@ namespace INFOIBV
             if (houghTransformCheckbox.Checked)
             {
                 getHoughTransform(grayscaleImage, houghImage);
-                for (int x = 0; x < houghSize - 1; x++)
-                {
-                    for (int y = 0; y < houghSize - 1; y++)
-                    {
-                        int val = truncate((int)houghImage[x, y]);
-                        if (houghThresholdCheckbox.Checked)
-                        {
-                            int up = truncate((int)houghImage[Math.Max(Math.Min(x, houghSize - 1), 0), Math.Max(Math.Min(y + 1, houghSize - 1), 0)]);
-                            int down = truncate((int)houghImage[Math.Max(Math.Min(x, houghSize - 1), 0), Math.Max(Math.Min(y - 1, houghSize - 1), 0)]);
-                            int left = truncate((int)houghImage[Math.Max(Math.Min(x - 1, houghSize - 1), 0), Math.Max(Math.Min(y, houghSize - 1), 0)]);
-                            int right = truncate((int)houghImage[Math.Max(Math.Min(x + 1, houghSize - 1), 0), Math.Max(Math.Min(y, houghSize - 1), 0)]);
-                            if (up > val || down > val || right > val || left > val)
-                            {
-                                val = 0;
-                            }
-                            if (val < int.Parse(houghThresholdVal.Text))
-                                val = 0;
-                            else
-                                val = 255;
-                            houghImage[x, y] = val;
-                        }
-                        Color color = Color.FromArgb(val, val, val);
-                        houghImageBitmap.SetPixel(x, y, color);
-                    }
-                }
+                houghImage = NonMaxSuppression(houghImage);
                 houghImageOutput.Image = houghImageBitmap;
             }
 
@@ -140,7 +116,31 @@ namespace INFOIBV
 
             if (lineDetectionCheckbox.Checked)
             {
-                List<int[]> lines = LineDetection(grayscaleImage, 10, 5, 100, 10, 10);
+                getHoughTransform(grayscaleImage, houghImage);
+                NonMaxSuppression(houghImage);
+                for (int o = 0; o < houghSize - 1; o++)
+                {
+                    for (int r = 0; r < houghSize - 1; r++)
+                    {
+                        if (houghImage[o, r] == 255)
+                        {
+                            List<int[]> lines = LineDetection(grayscaleImage, r, o, int.Parse(minIntensityThresVal.Text), int.Parse(minLengthParVal.Text), int.Parse(maxGapParVal.Text));
+                            for (int i = 0; i < lines.Count(); i++)
+                            {
+                                int startx = lines[i][0];
+                                int starty = lines[i][1];
+                                int endx = lines[i][2];
+                                int endy = lines[i][3];
+                                for (int x = startx; x < endx; x++)
+                                {
+                                    int y = (int)((r + Math.Cos(o) * x) / (Math.Sin(o)));
+                                    grayscaleImage[x, y] = 0;
+                                }
+
+                            }
+                        }
+                    }
+                }
             }
 
             //truncate and return grayscale image to actual image
@@ -210,7 +210,8 @@ namespace INFOIBV
                 for (int y = 0; y < InputImage.Size.Height; y++)
                 {
                     if (img[x, y] < minThreshold) continue;
-                    if (y == x * o + r)
+                    int i = (int)((r + Math.Cos(o) * x) / (Math.Sin(o)));
+                    if (y == i)
                     {
                         lines[x, y] = 1; 
                     }
@@ -218,15 +219,15 @@ namespace INFOIBV
             }
             for (int x = 0; x < InputImage.Size.Width; x++)
             {
-                int y = o * x + r;
-                if (y >= InputImage.Size.Height || y < 0) continue;
-                if (lines[x,y] == 1)
+                int j = (int)((r + Math.Cos(o) * x) / (Math.Sin(o)));
+                if (j >= InputImage.Size.Height || j < 0) continue;
+                if (lines[x,j] == 1)
                 {
                     // going from left to right
                     if (x < startx) startx = x;
                     if (x > endx) endx = x;
                 }
-                if (lines[x, y] == 0)
+                if (lines[x, j] == 0)
                 {
                     if (startx == 501)
                     {
@@ -234,8 +235,8 @@ namespace INFOIBV
                     }
                     else
                     {
-                        int starty = startx * o + r;
-                        int endy = endx * o + r;
+                        int starty = (int)((r + Math.Cos(o) * startx) / (Math.Sin(o)));
+                        int endy = (int)((r + Math.Cos(o) * endx) / (Math.Sin(o)));
                         int length = (int)Math.Sqrt(Math.Pow(endx - startx, 2) + Math.Pow(starty - endy, 2));
                         if (length > minLength)
                         {
@@ -267,8 +268,38 @@ namespace INFOIBV
             return output;
         }
 
+        private float[,] NonMaxSuppression(float[,] houghImage)
+        {
+            for (int x = 0; x < houghSize - 1; x++)
+            {
+                for (int y = 0; y < houghSize - 1; y++)
+                {
+                    int val = truncate((int)houghImage[x, y]);
+                    if (houghThresholdCheckbox.Checked)
+                    {
+                        int up = truncate((int)houghImage[Math.Max(Math.Min(x, houghSize - 1), 0), Math.Max(Math.Min(y + 1, houghSize - 1), 0)]);
+                        int down = truncate((int)houghImage[Math.Max(Math.Min(x, houghSize - 1), 0), Math.Max(Math.Min(y - 1, houghSize - 1), 0)]);
+                        int left = truncate((int)houghImage[Math.Max(Math.Min(x - 1, houghSize - 1), 0), Math.Max(Math.Min(y, houghSize - 1), 0)]);
+                        int right = truncate((int)houghImage[Math.Max(Math.Min(x + 1, houghSize - 1), 0), Math.Max(Math.Min(y, houghSize - 1), 0)]);
+                        if (up > val || down > val || right > val || left > val)
+                        {
+                            val = 0;
+                        }
+                        if (val < int.Parse(houghThresholdVal.Text))
+                            val = 0;
+                        else
+                            val = 255;
+                        houghImage[x, y] = val;
+                    }
+                    Color color = Color.FromArgb(val, val, val);
+                    houghImageBitmap.SetPixel(x, y, color);
+                }
+            }
+            return houghImage;
+        }
 
-        // returns (theta, r) pairs where value = 255 
+        /*
+        // returns (theta, r) pairs, stored in a 2d array
         private int[,] Accumulator(int[,] img, int threshold)
         {
             int rmax = (int)Math.Sqrt(Math.Pow(500, 2) * 2);
@@ -311,6 +342,7 @@ namespace INFOIBV
             }
             return acc;
         }
+        */
 
         /*
         private List<int[]> lineDetection(int[,] img, float[,] houghImage)

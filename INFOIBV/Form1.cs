@@ -260,11 +260,6 @@ namespace INFOIBV
                     output.Add(new int[] { line1[2], line1[3], line2[0], line2[1] });
                 }
             }
-            for (int x = 0; x < output.Count(); x++)
-            {
-                Debug.WriteLine(output[x][0]);
-                Debug.WriteLine(output[x][2]);
-            }
             return output;
         }
 

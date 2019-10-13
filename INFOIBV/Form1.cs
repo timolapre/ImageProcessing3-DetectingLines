@@ -116,15 +116,15 @@ namespace INFOIBV
 
             if (lineDetectionCheckbox.Checked)
             {
-                getHoughTransform(grayscaleImage, houghImage);
-                NonMaxSuppression(houghImage);
-                for (int o = 0; o < houghSize - 1; o++)
+                int[,] acc = Accumulator(grayscaleImage, int.Parse(minIntensityThresVal.Text));
+                int rmax = (int)Math.Sqrt(Math.Pow(500, 2) * 2);
+                for (int o = 0; o < 181; o++)
                 {
-                    for (int r = 0; r < houghSize - 1; r++)
+                    for (int r = 0; r < rmax; r++)
                     {
-                        if (houghImage[o, r] == 255)
+                        if (acc[o, r] == 255)
                         {
-                            List<int[]> lines = LineDetection(grayscaleImage, r, o, int.Parse(minIntensityThresVal.Text), int.Parse(minLengthParVal.Text), int.Parse(maxGapParVal.Text));
+                            List<int[]> lines = LineDetection(grayscaleImage, r - rmax / 2, o, int.Parse(minIntensityThresVal.Text), int.Parse(minLengthParVal.Text), int.Parse(maxGapParVal.Text));
                             for (int i = 0; i < lines.Count(); i++)
                             {
                                 int startx = lines[i][0];
@@ -133,7 +133,7 @@ namespace INFOIBV
                                 int endy = lines[i][3];
                                 for (int x = startx; x < endx; x++)
                                 {
-                                    int y = (int)((r + Math.Cos(o) * x) / (Math.Sin(o)));
+                                    int y = (int)(((r - rmax / 2) + Math.Cos(o) * x) / (Math.Sin(o)));
                                     grayscaleImage[x, y] = 0;
                                 }
 
@@ -203,7 +203,7 @@ namespace INFOIBV
         private List<int[]> LineDetection(int[,] img, int r, int o, int minThreshold, int minLength, int maxGap)
         {
             List<int[]> output = new List<int[]>();
-            int[,] lines = new int[InputImage.Size.Width,InputImage.Size.Height];
+            int[,] lines = new int[InputImage.Size.Width, InputImage.Size.Height];
             int startx = 501, endx = -1;
             for (int x = 0; x < InputImage.Size.Width; x++)
             {
@@ -213,7 +213,7 @@ namespace INFOIBV
                     int i = (int)((r + Math.Cos(o) * x) / (Math.Sin(o)));
                     if (y == i)
                     {
-                        lines[x, y] = 1; 
+                        lines[x, y] = 1;
                     }
                 }
             }
@@ -221,7 +221,7 @@ namespace INFOIBV
             {
                 int j = (int)((r + Math.Cos(o) * x) / (Math.Sin(o)));
                 if (j >= InputImage.Size.Height || j < 0) continue;
-                if (lines[x,j] == 1)
+                if (lines[x, j] == 1)
                 {
                     // going from left to right
                     if (x < startx) startx = x;
@@ -252,12 +252,12 @@ namespace INFOIBV
             {
                 int[] line1 = output[i];
                 int[] line2 = output[i + 1];
-                int gap  = (int)Math.Sqrt(Math.Pow(line1[2] - line2[0], 2) + Math.Pow(line2[1] - line1[3], 2));
+                int gap = (int)Math.Sqrt(Math.Pow(line1[2] - line2[0], 2) + Math.Pow(line2[1] - line1[3], 2));
                 if (gap < maxGap)
                 {
                     output.Remove(line1);
                     output.Remove(line2);
-                    output.Add(new int[] { line1[2], line1[3], line2[0], line2[1]});
+                    output.Add(new int[] { line1[2], line1[3], line2[0], line2[1] });
                 }
             }
             for (int x = 0; x < output.Count(); x++)
@@ -298,19 +298,20 @@ namespace INFOIBV
             return houghImage;
         }
 
-        /*
+
         // returns (theta, r) pairs, stored in a 2d array
         private int[,] Accumulator(int[,] img, int threshold)
         {
             int rmax = (int)Math.Sqrt(Math.Pow(500, 2) * 2);
-            int[,] acc = new int[180, rmax];
-            for (int x = 0; x < InputImage.Size.Width; x++)
+            int[,] acc = new int[180 + 1, rmax + 1];
+
+            for (int x = -(InputImage.Size.Width / 2); x < (InputImage.Size.Width / 2); x++)
             {
-                for (int y = 0; y < InputImage.Size.Height; y++)
+                for (int y = -(InputImage.Size.Height / 2); y < (InputImage.Size.Height / 2); y++)
                 {
-                    for (int o = 0; o < 180; o++)
+                    for (int o = 0; o <= 180; o++)
                     {
-                        int r = (int)(x * Math.Cos(toRadian(o)) + y * Math.Sin(toRadian(o)));
+                        int r = (int)(x * Math.Cos(toRadian(o)) + y * Math.Sin(toRadian(o))) + (rmax / 2);
                         acc[o, r] += 1;
                     }
                 }
@@ -321,10 +322,10 @@ namespace INFOIBV
                 for (int y = 0; y < rmax; y++)
                 {
                     int value = acc[x, y];
-                    int up = acc[Math.Max(Math.Min(189, x), 0), Math.Max(Math.Min(rmax, (y + 1)), 0)];
-                    int right = acc[Math.Max(Math.Min(189, (x + 1)), 0), Math.Max(Math.Min(rmax, y), 0)];
-                    int down = acc[Math.Max(Math.Min(189, (x)), 0), Math.Max(Math.Min(rmax, (y - 1)), 0)];
-                    int left = acc[Math.Max(Math.Min(189, (x - 1)), 0), Math.Max(Math.Min(rmax, y), 0)];
+                    int up = acc[Math.Max(Math.Min(180, x), 0), Math.Max(Math.Min(rmax, (y + 1)), 0)];
+                    int right = acc[Math.Max(Math.Min(180, (x + 1)), 0), Math.Max(Math.Min(rmax, y), 0)];
+                    int down = acc[Math.Max(Math.Min(180, (x)), 0), Math.Max(Math.Min(rmax, (y - 1)), 0)];
+                    int left = acc[Math.Max(Math.Min(180, (x - 1)), 0), Math.Max(Math.Min(rmax, y), 0)];
                     if (up > value || down > value || right > value || left > value)
                     {
                         value = 0;
@@ -342,7 +343,6 @@ namespace INFOIBV
             }
             return acc;
         }
-        */
 
         /*
         private List<int[]> lineDetection(int[,] img, float[,] houghImage)
@@ -384,9 +384,9 @@ namespace INFOIBV
             int[,] labelImg = new int[InputImage.Size.Width, InputImage.Size.Height];
             getBinaryLabel(img, labelImg);
             int label = 1;
-            for (int y = 1; y < InputImage.Size.Height-1; y++)
+            for (int y = 1; y < InputImage.Size.Height - 1; y++)
             {
-                for (int x = 1; x < InputImage.Size.Width-1; x++)
+                for (int x = 1; x < InputImage.Size.Width - 1; x++)
                 {
                     if (labelImg[x - 1, y] == 0 && labelImg[x, y] == 1)
                     {
@@ -400,9 +400,9 @@ namespace INFOIBV
                         boundaryDirection = 0;
                         firstX = -1;
                         firstY = -1;
-                        while (traceContour(labelImg, label,true,shapeSizeList,shapeBoundaries)) ;
+                        while (traceContour(labelImg, label, true, shapeSizeList, shapeBoundaries)) ;
                     }
-                    else if(labelImg[x-1,y] > 1 && labelImg[x,y] == 0)
+                    else if (labelImg[x - 1, y] > 1 && labelImg[x, y] == 0)
                     {
                         startX = x;
                         startY = y;
@@ -411,7 +411,7 @@ namespace INFOIBV
                         boundaryDirection = 0;
                         firstX = -1;
                         firstY = -1;
-                        while (traceContourInner(labelImg, labelImg[x - 1, y] ,false, shapeSizeList,shapeBoundaries)) ;
+                        while (traceContourInner(labelImg, labelImg[x - 1, y], false, shapeSizeList, shapeBoundaries)) ;
                     }
                     else if (labelImg[x - 1, y] > 1 && labelImg[x, y] == 1)
                     {
@@ -506,18 +506,18 @@ namespace INFOIBV
             labelPixels(labelImg, boundaryX, boundaryY, label);
 
             if (sizeCount)
-                shapeSize[label-2]++;
-            if(!FullShapes.Checked)
-                shapeBoundaries[label - 2].Add(new int[2] {boundaryX,boundaryY});
+                shapeSize[label - 2]++;
+            if (!FullShapes.Checked)
+                shapeBoundaries[label - 2].Add(new int[2] { boundaryX, boundaryY });
             //Debug.WriteLine(startX + " " + startY + " " + firstX + " " + firstY + " " + label + " " + boundaryDirection + " " + boundaryX + " " + boundaryY);
             if (firstX == -1 && firstY == -1 && (boundaryX != startX || boundaryY != startY))
             {
                 firstX = boundaryX;
                 firstY = boundaryY;
             }
-            for (int i = boundaryDirection; i < boundaryDirection+4; i++)
+            for (int i = boundaryDirection; i < boundaryDirection + 4; i++)
             {
-                if (i%4 == 0)
+                if (i % 4 == 0)
                 {
                     if (boundaryY > 0 && labelImg[boundaryX, boundaryY - 1] >= 1)
                     {
@@ -532,12 +532,12 @@ namespace INFOIBV
                 }
                 if (i % 4 == 1)
                 {
-                    if (boundaryX < OutputWidth-1 && labelImg[boundaryX+1, boundaryY] >= 1)
+                    if (boundaryX < OutputWidth - 1 && labelImg[boundaryX + 1, boundaryY] >= 1)
                     {
                         if (boundaryX + 1 == firstX && boundaryY == firstY && boundaryX == startX && boundaryY == startY)
                             return false;
                         boundaryDirection = (i + 3) % 4;
-                        boundaryX = boundaryX+1;
+                        boundaryX = boundaryX + 1;
                         return true;
                     }
                     else
@@ -545,7 +545,7 @@ namespace INFOIBV
                 }
                 if (i % 4 == 2)
                 {
-                    if (boundaryY < OutputHeight-1 && labelImg[boundaryX, boundaryY + 1] >= 1)
+                    if (boundaryY < OutputHeight - 1 && labelImg[boundaryX, boundaryY + 1] >= 1)
                     {
                         if (boundaryX == firstX && boundaryY + 1 == firstY && boundaryX == startX && boundaryY == startY)
                             return false;
@@ -586,7 +586,7 @@ namespace INFOIBV
                 firstX = boundaryX;
                 firstY = boundaryY;
             }
-            for (int i = boundaryDirection+4; i > boundaryDirection; i--)
+            for (int i = boundaryDirection + 4; i > boundaryDirection; i--)
             {
                 if (i % 4 == 0)
                 {
@@ -594,7 +594,7 @@ namespace INFOIBV
                     {
                         if (boundaryX == firstX && boundaryY - 1 == firstY && boundaryX == startX && boundaryY == startY)
                             return false;
-                        boundaryDirection = i+1;
+                        boundaryDirection = i + 1;
                         boundaryY = boundaryY - 1;
                         return true;
                     }
@@ -607,7 +607,7 @@ namespace INFOIBV
                     {
                         if (boundaryX + 1 == firstX && boundaryY == firstY && boundaryX == startX && boundaryY == startY)
                             return false;
-                        boundaryDirection = i+1;
+                        boundaryDirection = i + 1;
                         boundaryX = boundaryX + 1;
                         return true;
                     }
@@ -620,7 +620,7 @@ namespace INFOIBV
                     {
                         if (boundaryX == firstX && boundaryY + 1 == firstY && boundaryX == startX && boundaryY == startY)
                             return false;
-                        boundaryDirection = i+1;
+                        boundaryDirection = i + 1;
                         boundaryY = boundaryY + 1;
                         return true;
                     }
@@ -633,7 +633,7 @@ namespace INFOIBV
                     {
                         if (boundaryX - 1 == firstX && boundaryY == firstY && boundaryX == startX && boundaryY == startY)
                             return false;
-                        boundaryDirection = i+1;
+                        boundaryDirection = i + 1;
                         boundaryX = boundaryX - 1;
                         return true;
                     }
@@ -647,14 +647,15 @@ namespace INFOIBV
         private void labelPixels(int[,] labelImg, int x, int y, int label)
         {
             labelImg[x, y] = label;
-            if (x < OutputWidth-1 && labelImg[x + 1, y] == 0)
+            if (x < OutputWidth - 1 && labelImg[x + 1, y] == 0)
                 labelImg[x + 1, y] = -1;
-            if (y < OutputHeight-1 && labelImg[x, y + 1] == 0)
+            if (y < OutputHeight - 1 && labelImg[x, y + 1] == 0)
                 labelImg[x, y + 1] = -1;
 
         }
 
-        private void getBinaryLabel(int[,] img, int[,] labelImg) {
+        private void getBinaryLabel(int[,] img, int[,] labelImg)
+        {
             for (int x = 0; x < InputImage.Size.Width; x++)
             {
                 for (int y = 0; y < InputImage.Size.Height; y++)
@@ -682,12 +683,12 @@ namespace INFOIBV
                 for (int y = 0; y < InputImage.Size.Height; y++)
                 {
                     int pixelColor = img[x, y];
-                    img[x, y] = 255-pixelColor;
+                    img[x, y] = 255 - pixelColor;
                 }
             }
             return img;
         }
-        
+
         private int truncate(int value)
         {
             return Math.Max(Math.Min(value, 255), 0);
@@ -723,7 +724,7 @@ namespace INFOIBV
     public class pair
     {
         int theta, r;
-        pair (int theta, int r)
+        pair(int theta, int r)
         {
             this.theta = theta;
             this.r = r;
